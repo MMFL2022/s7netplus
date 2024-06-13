@@ -13,9 +13,8 @@ namespace S7.Net.Types
         public static Int32 FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 4)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 4 bytes.");
-            }
+
             return bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
         }
 
@@ -41,8 +40,10 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(Int32[] value)
         {
             ByteArray arr = new ByteArray();
+
             foreach (Int32 val in value)
                 arr.Add(ToByteArray(val));
+
             return arr.Array;
         }
 
@@ -59,7 +60,5 @@ namespace S7.Net.Types
 
             return values;
         }
-        
-
     }
 }

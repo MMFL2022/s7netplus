@@ -194,14 +194,12 @@ namespace S7.Net
                         return Types.LReal.FromByteArray(bytes);
                     else
                         return Types.LReal.ToArray(bytes);
-
                 case VarType.String:
                     return Types.String.FromByteArray(bytes);
                 case VarType.S7String:
                     return S7String.FromByteArray(bytes);
                 case VarType.S7WString:
                     return S7WString.FromByteArray(bytes);
-
                 case VarType.Timer:
                     if (varCount == 1)
                         return Timer.FromByteArray(bytes);
@@ -221,45 +219,27 @@ namespace S7.Net
                             return Bit.FromByte(bytes[0], bitAdr);
                     }
                     else
-                    {
                         return Bit.ToBitArray(bytes, varCount);
-                    }
                 case VarType.DateTime:
                     if (varCount == 1)
-                    {
                         return DateTime.FromByteArray(bytes);
-                    }
                     else
-                    {
                         return DateTime.ToArray(bytes);
-                    }
                 case VarType.DateTimeLong:
                     if (varCount == 1)
-                    {
                         return DateTimeLong.FromByteArray(bytes);
-                    }
                     else
-                    {
                         return DateTimeLong.ToArray(bytes);
-                    }
                 case VarType.Time:
                     if (varCount == 1)
-                    {
                         return TimeSpan.FromByteArray(bytes);
-                    }
                     else
-                    {
                         return TimeSpan.ToArray(bytes);
-                    }
                 case VarType.Date:
                     if (varCount == 1)
-                    {
                         return Date.FromByteArray(bytes);
-                    }
                     else
-                    {
                         return Date.ToArray(bytes);
-                    }
                 default:
                     return null;
             }
@@ -330,8 +310,7 @@ namespace S7.Net
                     dataItem.VarType,
                     s7data.Skip(offset).Take(byteCnt).ToArray(),
                     dataItem.Count,
-                    dataItem.BitAdr
-                );
+                    dataItem.BitAdr);
 
                 // next Item
                 offset += byteCnt;

@@ -13,8 +13,7 @@ namespace S7.Net
         {
         }
 
-        public PlcException(ErrorCode errorCode, Exception innerException) : this(errorCode, innerException.Message,
-            innerException)
+        public PlcException(ErrorCode errorCode, Exception innerException) : this(errorCode, innerException.Message, innerException)
         {
         }
 

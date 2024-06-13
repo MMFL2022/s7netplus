@@ -5,18 +5,16 @@ using System.Threading.Tasks;
 
 namespace S7.Net
 {
-
     /// <summary>
     /// Describes a TPKT Packet
     /// </summary>
     internal class TPKT
     {
-
-
         public byte Version;
         public byte Reserved1;
         public int Length;
         public byte[] Data;
+
         private TPKT(byte version, byte reserved1, int length, byte[] data)
         {
             Version = version;
@@ -34,8 +32,11 @@ namespace S7.Net
         public static async Task<TPKT> ReadAsync(Stream stream, CancellationToken cancellationToken)
         {
             var buf = new byte[4];
+
             int len = await stream.ReadExactAsync(buf, 0, 4, cancellationToken).ConfigureAwait(false);
-            if (len < 4) throw new TPKTInvalidException("TPKT is incomplete / invalid");
+
+            if (len < 4)
+                throw new TPKTInvalidException("TPKT is incomplete / invalid");
 
             var version = buf[0];
             var reserved1 = buf[1];
@@ -43,6 +44,7 @@ namespace S7.Net
 
             var data = new byte[length - 4];
             len = await stream.ReadExactAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+
             if (len < data.Length)
                 throw new TPKTInvalidException("TPKT payload incomplete / invalid");
 
@@ -57,11 +59,7 @@ namespace S7.Net
 
         public override string ToString()
         {
-            return string.Format("Version: {0} Length: {1} Data: {2}",
-                Version,
-                Length,
-                BitConverter.ToString(Data)
-                );
+            return $"Version: {Version} Length: {Length} Data: {BitConverter.ToString(Data)}";
         }
     }
 }

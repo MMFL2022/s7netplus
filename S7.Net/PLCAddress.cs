@@ -73,8 +73,10 @@
                             return;
                         case "DBX":
                             bitNumber = int.Parse(strings[2]);
+
                             if (bitNumber > 7)
                                 throw new InvalidAddressException("Bit can only be 0-7");
+
                             varType = VarType.Bit;
                             return;
                         default:
@@ -200,6 +202,7 @@
                     bitNumber = int.Parse(txt2.Substring(txt2.IndexOf(".") + 1));
                     if (bitNumber > 7)
                         throw new InvalidAddressException("Bit can only be 0-7");
+
                     return;
             }
         }

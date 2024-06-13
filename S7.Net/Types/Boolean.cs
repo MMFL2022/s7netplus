@@ -1,12 +1,12 @@
 ﻿namespace S7.Net.Types
 {
     /// <summary>
-    /// Contains the methods to read, set and reset bits inside bytes
+    /// Contains the methods to read, set and reset bits inside bytes.
     /// </summary>
     public static class Boolean
     {
         /// <summary>
-        /// Returns the value of a bit in a bit, given the address of the bit
+        /// Returns the value of a bit in a byte, given the address of the bit.
         /// </summary>
         public static bool GetValue(byte value, int bit)
         {
@@ -52,7 +52,7 @@
         }
 
         /// <summary>
-        /// Resets the value of a bit to 0 (false), given the address of the bit
+        /// Resets the value of a bit to 0 (false), given the address of the bit.
         /// </summary>
         /// <param name="value">The input value to modify.</param>
         /// <param name="bit">The index (zero based) of the bit to clear.</param>

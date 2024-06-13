@@ -34,6 +34,5 @@
         {
             return System.Text.Encoding.ASCII.GetString(bytes);
         }
-
     }
 }

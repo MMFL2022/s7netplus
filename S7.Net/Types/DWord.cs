@@ -40,19 +40,16 @@ namespace S7.Net.Types
             return bytes;
         }
 
-
-
-
-
-
         /// <summary>
         /// Converts an array of uint (UInt32) to an array of S7 DWord (4 bytes) 
         /// </summary>
         public static byte[] ToByteArray(UInt32[] value)
         {
             ByteArray arr = new ByteArray();
+
             foreach (UInt32 val in value)
                 arr.Add(ToByteArray(val));
+
             return arr.Array;
         }
 

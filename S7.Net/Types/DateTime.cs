@@ -77,6 +77,7 @@ namespace S7.Net.Types
                 if (input < min)
                     throw new ArgumentOutOfRangeException(nameof(input), input,
                         $"Value '{input}' is lower than the minimum '{min}' allowed for {field}.");
+
                 if (input > max)
                     throw new ArgumentOutOfRangeException(nameof(input), input,
                         $"Value '{input}' is higher than the maximum '{max}' allowed for {field}.");
@@ -114,11 +115,11 @@ namespace S7.Net.Types
 
             if (dateTime < SpecMinimumDateTime)
                 throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime,
-                    $"Date time '{dateTime}' is before the minimum '{SpecMinimumDateTime}' supported in S7 date time representation.");
+                    $"DateTime '{dateTime}' is before the minimum '{SpecMinimumDateTime}' supported in S7 date time representation.");
 
             if (dateTime > SpecMaximumDateTime)
                 throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime,
-                    $"Date time '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 date time representation.");
+                    $"DateTime '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 date time representation.");
 
             byte MapYear(int year) => (byte) (year < 2000 ? year - 1900 : year - 2000);
 

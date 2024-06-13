@@ -14,9 +14,7 @@ namespace S7.Net.Protocol
         public static byte[] SerializeDataItem(DataItem dataItem)
         {
             if (dataItem.Value == null)
-            {
                 throw new Exception($"DataItem.Value is null, cannot serialize. StartAddr={dataItem.StartByteAdr} VarType={dataItem.VarType}");
-            }
 
             if (dataItem.Value is string s)
                 return dataItem.VarType switch
@@ -27,9 +25,7 @@ namespace S7.Net.Protocol
                 };
 
             if (dataItem.VarType == VarType.Date)
-            {
                 return Date.ToByteArray((System.DateTime)dataItem.Value);
-            }
 
             return SerializeValue(dataItem.Value);
         }

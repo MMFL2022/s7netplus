@@ -48,7 +48,6 @@ namespace S7.Net.Types
         public int ReservedLengthInBytes => type == S7StringType.S7String ? reservedLength + 2 : (reservedLength * 2) + 4;
     }
 
-
     /// <summary>
     /// String type.
     /// </summary>

@@ -13,9 +13,8 @@ namespace S7.Net.Types
         public static UInt16 FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 2)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
-            }
+
             // bytes[0] -> HighByte
             // bytes[1] -> LowByte
             return (UInt16)((bytes[0] << 8) | bytes[1]);

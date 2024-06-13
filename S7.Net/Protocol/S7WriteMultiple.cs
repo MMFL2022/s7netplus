@@ -13,8 +13,7 @@ namespace S7.Net.Protocol
             message[Header.Offsets.ParameterCount] = (byte) dataItems.Length;
             var paramSize = dataItems.Length * Parameter.Template.Length;
 
-            Serialization.SetWordAt(message, Header.Offsets.ParameterSize,
-                (ushort) (2 + paramSize));
+            Serialization.SetWordAt(message, Header.Offsets.ParameterSize, (ushort) (2 + paramSize));
 
             var paramOffset = Header.Template.Length;
             var data = new ByteArray();
@@ -40,16 +39,15 @@ namespace S7.Net.Protocol
                         throw new ArgumentException(
                             $"Cannot read bit with invalid {nameof(item.BitAdr)} '{item.BitAdr}'.", nameof(dataItems));
 
-                    Serialization.SetAddressAt(message, paramOffset + Parameter.Offsets.Address, item.StartByteAdr,
-                        item.BitAdr);
+                    Serialization.SetAddressAt(message, paramOffset + Parameter.Offsets.Address, item.StartByteAdr, item.BitAdr);
 
                     data.Add(0x03);
                     data.AddWord(1);
 
                     data.Add(b ? (byte)1 : (byte)0);
-                    if (itemCount != dataItems.Length) { 
+
+                    if (itemCount != dataItems.Length)
                         data.Add(0);
-                    }
                 }
                 else
                 {
@@ -61,9 +59,7 @@ namespace S7.Net.Protocol
                     data.Add(value);
                     
                     if ((len & 0b1) == 1 && itemCount != dataItems.Length)
-                    {
                         data.Add(0);
-                    }
                 }
 
                 paramOffset += Parameter.Template.Length;
@@ -107,8 +103,7 @@ namespace S7.Net.Protocol
             }
 
             if (errors != null)
-                throw new AggregateException(
-                    $"Write failed for {errors.Count} items. See the innerExceptions for details.", errors);
+                throw new AggregateException($"Write failed for {errors.Count} items. See the innerException for details.", errors);
         }
 
         private static class Header
@@ -116,15 +111,15 @@ namespace S7.Net.Protocol
             public static byte[] Template { get; } =
             {
                 0x03, 0x00, 0x00, 0x00, // TPKT
-                0x02, 0xf0, 0x80, // ISO DT
-                0x32, // S7 protocol ID
-                0x01, // JobRequest
-                0x00, 0x00, // Reserved
-                0x05, 0x00, // PDU reference
-                0x00, 0x0e, // Parameters length
-                0x00, 0x00, // Data length
-                0x05, // Function: Write var
-                0x00, // Number of items to write
+                0x02, 0xf0, 0x80,       // ISO DT
+                0x32,                   // S7 protocol ID
+                0x01,                   // JobRequest
+                0x00, 0x00,             // Reserved
+                0x05, 0x00,             // PDU reference
+                0x00, 0x0e,             // Parameters length
+                0x00, 0x00,             // Data length
+                0x05,                   // Function: Write var
+                0x00,                   // Number of items to write
             };
 
             public static class Offsets
@@ -140,14 +135,14 @@ namespace S7.Net.Protocol
         {
             public static byte[] Template { get; } =
             {
-                0x12, // Spec
-                0x0a, // Length of remaining bytes
-                0x10, // Addressing mode
-                0x02, // Transport size
-                0x00, 0x00, // Number of elements
-                0x00, 0x00, // DB number
-                0x84, // Area type
-                0x00, 0x00, 0x00 // Area offset
+                0x12,                   // Spec
+                0x0a,                   // Length of remaining bytes
+                0x10,                   // Addressing mode
+                0x02,                   // Transport size
+                0x00, 0x00,             // Number of elements
+                0x00, 0x00,             // DB number
+                0x84,                   // Area type
+                0x00, 0x00, 0x00        // Area offset
             };
 
             public static class Offsets

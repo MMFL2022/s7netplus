@@ -33,7 +33,6 @@ namespace S7.Net.Types
             return d;
         }
 
-
         /// <summary>
         /// Converts a double to S7 Real (4 bytes)
         /// </summary>
@@ -45,8 +44,10 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(float[] value)
         {
             ByteArray arr = new ByteArray();
+
             foreach (float val in value)
                 arr.Add(ToByteArray(val));
+
             return arr.Array;
         }
 
@@ -63,6 +64,5 @@ namespace S7.Net.Types
 
             return values;
         }
-        
     }
 }

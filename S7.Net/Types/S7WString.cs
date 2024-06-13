@@ -17,17 +17,13 @@ namespace S7.Net.Types
         public static string FromByteArray(byte[] bytes)
         {
             if (bytes.Length < 4)
-            {
                 throw new PlcException(ErrorCode.ReadData, "Malformed S7 WString / too short");
-            }
 
             int size = (bytes[0] << 8) | bytes[1];
             int length = (bytes[2] << 8) | bytes[3];
 
             if (length > size)
-            {
                 throw new PlcException(ErrorCode.ReadData, "Malformed S7 WString / length larger than capacity");
-            }
 
             try
             {
@@ -39,7 +35,6 @@ namespace S7.Net.Types
                     $"Failed to parse {VarType.S7WString} from data. Following fields were read: size: '{size}', actual length: '{length}', total number of bytes (including header): '{bytes.Length}'.",
                     e);
             }
-            
         }
 
         /// <summary>
@@ -51,11 +46,10 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(string? value, int reservedLength)
         {
             if (value is null)
-            {
                 throw new ArgumentNullException(nameof(value));
-            }
 
-            if (reservedLength > 16382) throw new ArgumentException("The maximum string length supported is 16382.");
+            if (reservedLength > 16382)
+                throw new ArgumentException("The maximum string length supported is 16382.");
             
             var buffer = new byte[4 + reservedLength * 2];
             buffer[0] = (byte)((reservedLength >> 8) & 0xFF);
@@ -64,7 +58,8 @@ namespace S7.Net.Types
             buffer[3] = (byte)(value.Length & 0xFF);
 
             var stringLength = Encoding.BigEndianUnicode.GetBytes(value, 0, value.Length, buffer, 4) / 2;
-            if (stringLength > reservedLength) throw new ArgumentException($"The provided string length ({stringLength} is larger than the specified reserved length ({reservedLength}).");
+            if (stringLength > reservedLength)
+                throw new ArgumentException($"The provided string length ({stringLength} is larger than the specified reserved length ({reservedLength}).");
 
             return buffer;
         }

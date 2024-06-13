@@ -85,8 +85,7 @@ namespace S7.Net.Protocol
             }
         }
 
-        private static ArgumentOutOfRangeException InvalidRackOrSlot(int value, string name, string extrema,
-            int extremaValue)
+        private static ArgumentOutOfRangeException InvalidRackOrSlot(int value, string name, string extrema, int extremaValue)
         {
             return new ArgumentOutOfRangeException(name,
                 $"Invalid {name} value specified (decimal: {value}, hexadecimal: {value:X}), {extrema} value " +

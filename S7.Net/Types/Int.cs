@@ -13,9 +13,8 @@ namespace S7.Net.Types
         public static short FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 2)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
-            }
+
             // bytes[0] -> HighByte
             // bytes[1] -> LowByte
             return (short)((int)(bytes[1]) | ((int)(bytes[0]) << 8));
@@ -48,6 +47,7 @@ namespace S7.Net.Types
                 bytes[bytesPos++] = (byte)((value[i] >> 8) & 0xFF);
                 bytes[bytesPos++] = (byte) (value[i] & 0xFF);
             }
+
             return bytes;
         }
 
@@ -80,8 +80,8 @@ namespace S7.Net.Types
                 value = 32768 - value;
                 value *= -1;
             }
+
             return (short)value;
         }
-
     }
 }

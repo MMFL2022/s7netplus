@@ -10,6 +10,7 @@ namespace S7.Net.Types
     public static class DateTimeLong
     {
         public const int TypeLengthInBytes = 12;
+
         /// <summary>
         /// The minimum <see cref="T:System.DateTime" /> value supported by the specification.
         /// </summary>
@@ -48,10 +49,8 @@ namespace S7.Net.Types
         public static System.DateTime[] ToArray(byte[] bytes)
         {
             if (bytes.Length % TypeLengthInBytes != 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(bytes), bytes.Length,
                     $"Parsing an array of DateTimeLong requires a multiple of 12 bytes of input data, input data is '{bytes.Length}' long.");
-            }
 
             var cnt = bytes.Length / TypeLengthInBytes;
             var result = new System.DateTime[cnt];
@@ -69,11 +68,8 @@ namespace S7.Net.Types
         private static System.DateTime FromByteArrayImpl(byte[] bytes)
         {
             if (bytes.Length != TypeLengthInBytes)
-            {
                 throw new ArgumentOutOfRangeException(nameof(bytes), bytes.Length,
                     $"Parsing a DateTimeLong requires exactly 12 bytes of input data, input data is {bytes.Length} bytes long.");
-            }
-
 
             var year = AssertRangeInclusive(Word.FromBytes(bytes[1], bytes[0]), 1970, 2262, "year");
             var month = AssertRangeInclusive(bytes[2], 1, 12, "month");
@@ -82,12 +78,12 @@ namespace S7.Net.Types
             var hour = AssertRangeInclusive(bytes[5], 0, 23, "hour");
             var minute = AssertRangeInclusive(bytes[6], 0, 59, "minute");
             var second = AssertRangeInclusive(bytes[7], 0, 59, "second");
-            ;
 
             var nanoseconds = AssertRangeInclusive<uint>(DWord.FromBytes(bytes[11], bytes[10], bytes[9], bytes[8]), 0,
                 999999999, "nanoseconds");
 
             var time = new System.DateTime(year, month, day, hour, minute, second);
+
             return time.AddTicks(nanoseconds / 100);
         }
 
@@ -104,16 +100,12 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(System.DateTime dateTime)
         {
             if (dateTime < SpecMinimumDateTime)
-            {
                 throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime,
-                    $"Date time '{dateTime}' is before the minimum '{SpecMinimumDateTime}' supported in S7 DateTimeLong representation.");
-            }
+                    $"DateTime '{dateTime}' is before the minimum '{SpecMinimumDateTime}' supported in S7 DateTimeLong representation.");
 
             if (dateTime > SpecMaximumDateTime)
-            {
                 throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime,
-                    $"Date time '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 DateTimeLong representation.");
-            }
+                    $"DateTime '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 DateTimeLong representation.");
 
             var stream = new MemoryStream(TypeLengthInBytes);
             // Convert Year
@@ -168,16 +160,12 @@ namespace S7.Net.Types
         private static T AssertRangeInclusive<T>(T input, T min, T max, string field) where T : IComparable<T>
         {
             if (input.CompareTo(min) < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(input), input,
                     $"Value '{input}' is lower than the minimum '{min}' allowed for {field}.");
-            }
 
             if (input.CompareTo(max) > 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(input), input,
                     $"Value '{input}' is higher than the maximum '{max}' allowed for {field}.");
-            }
 
             return input;
         }

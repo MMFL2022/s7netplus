@@ -89,7 +89,8 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(System.TimeSpan[] timeSpans)
         {
             var bytes = new List<byte>(timeSpans.Length * 4);
-            foreach (var timeSpan in timeSpans) bytes.AddRange(ToByteArray(timeSpan));
+            foreach (var timeSpan in timeSpans)
+                bytes.AddRange(ToByteArray(timeSpan));
 
             return bytes.ToArray();
         }

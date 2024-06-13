@@ -30,9 +30,7 @@ namespace S7.Net.Types
         public static System.DateTime FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 2)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
-            }
 
             var daysSinceDateStart = Word.FromByteArray(bytes);
             if (daysSinceDateStart > MaxNumberOfDays)
@@ -55,8 +53,10 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(System.DateTime[] value)
         {
             var arr = new ByteArray();
+
             foreach (var date in value)
                 arr.Add(ToByteArray(date));
+
             return arr.Array;
         }
 

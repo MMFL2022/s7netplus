@@ -29,6 +29,7 @@ partial class Plc
         stream.Write(new byte[] { 0x0a, 0x00, 0x00, 0x00 });
 
         stream.SetLength(stream.Position);
+
         return stream.ToArray();
     }
 
@@ -42,14 +43,15 @@ partial class Plc
         AssertUserDataResult(message, 0xff);
 
         var len = Word.FromByteArray(message.Skip(udLenOffset).Take(2).ToArray());
+
         if (len != DateTimeLength)
-        {
             throw new Exception($"Unexpected response length {len}, expected {DateTimeLength}.");
-        }
 
         // Skip first 2 bytes from date time value because DateTime.FromByteArray doesn't parse them.
-        return Types.DateTime.FromByteArray(message.Skip(udValueOffset + dateTimeSkip)
-            .Take(DateTimeLength - dateTimeSkip).ToArray());
+        return Types.DateTime.FromByteArray(message
+            .Skip(udValueOffset + dateTimeSkip)
+            .Take(DateTimeLength - dateTimeSkip)
+            .ToArray());
     }
 
     private static byte[] BuildClockWriteRequest(DateTime value)
@@ -63,6 +65,7 @@ partial class Plc
         stream.Write(Types.DateTime.ToByteArray(value));
 
         stream.SetLength(stream.Position);
+
         return stream.ToArray();
     }
 
@@ -75,18 +78,16 @@ partial class Plc
     private static void AssertPduResult(byte[] message)
     {
         var pduErr = Word.FromByteArray(message.Skip(PduErrOffset).Take(2).ToArray());
+
         if (pduErr != 0)
-        {
             throw new Exception($"Response from PLC indicates error 0x{pduErr:X4}.");
-        }
     }
 
     private static void AssertUserDataResult(byte[] message, byte expected)
     {
         var dtResult = message[UserDataResultOffset];
+
         if (dtResult != expected)
-        {
             throw new Exception($"Response from PLC was 0x{dtResult:X2}, expected 0x{expected:X2}.");
-        }
     }
 }

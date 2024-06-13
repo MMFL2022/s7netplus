@@ -101,7 +101,7 @@ namespace S7.Net
         /// <summary>
         /// Reads all the bytes needed to fill a struct in C#, starting from a certain address, and return an object that can be casted to the struct.
         /// </summary>
-        /// <param name="structType">Type of the struct to be readed (es.: TypeOf(MyStruct)).</param>
+        /// <param name="structType">Type of the struct to be read (es.: TypeOf(MyStruct)).</param>
         /// <param name="db">Address of the DB.</param>
         /// <param name="startByteAdr">Start byte address. If you want to read DB1.DBW200, this is 200.</param>
         /// <returns>Returns a struct that must be cast. If no data has been read, null will be returned</returns>
@@ -139,9 +139,7 @@ namespace S7.Net
         {
             int numBytes = (int)Class.GetClassSize(sourceClass);
             if (numBytes <= 0)
-            {
                 throw new Exception("The size of the class is less than 1 byte and therefore cannot be read");
-            }
 
             // now read the package
             var resultBytes = ReadBytes(DataType.DataBlock, db, startByteAdr, numBytes);
@@ -178,9 +176,8 @@ namespace S7.Net
             var instance = classFactory();
             int readBytes = ReadClass(instance, db, startByteAdr);
             if (readBytes <= 0)
-            {
                 return null;
-            }
+
             return instance;
         }
 
@@ -231,7 +228,7 @@ namespace S7.Net
         public void WriteBit(DataType dataType, int db, int startByteAdr, int bitAdr, bool value)
         {
             if (bitAdr < 0 || bitAdr > 7)
-                throw new InvalidAddressException(string.Format("Addressing Error: You can only reference bitwise locations 0-7. Address {0} is invalid", bitAdr));
+                throw new InvalidAddressException($"Addressing Error: You can only reference bitwise locations 0-7. Address {bitAdr} is invalid.");
 
             WriteBitWithASingleRequest(dataType, db, startByteAdr, bitAdr, value);
         }
@@ -268,23 +265,21 @@ namespace S7.Net
             {
                 //Must be writing a bit value as bitAdr is specified
                 if (value is bool boolean)
-                {
                     WriteBit(dataType, db, startByteAdr, bitAdr, boolean);
-                }
                 else if (value is int intValue)
                 {
                     if (intValue < 0 || intValue > 7)
                         throw new ArgumentOutOfRangeException(
-                            string.Format(
-                                "Addressing Error: You can only reference bitwise locations 0-7. Address {0} is invalid",
-                                bitAdr), nameof(bitAdr));
+                                $"Addressing Error: You can only reference bitwise locations 0-7. Address {bitAdr} is invalid",
+                                nameof(bitAdr));
 
                     WriteBit(dataType, db, startByteAdr, bitAdr, intValue == 1);
                 }
                 else
                     throw new ArgumentException("Value must be a bool or an int to write a bit", nameof(value));
             }
-            else WriteBytes(dataType, db, startByteAdr, Serialization.SerializeValue(value));
+            else
+                WriteBytes(dataType, db, startByteAdr, Serialization.SerializeValue(value));
         }
 
         /// <summary>

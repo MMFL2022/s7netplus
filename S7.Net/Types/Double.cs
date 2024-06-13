@@ -45,8 +45,10 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(double[] value)
         {
             ByteArray arr = new ByteArray();
+
             foreach (double val in value)
                 arr.Add(ToByteArray(val));
+
             return arr.Array;
         }
 
@@ -63,6 +65,5 @@ namespace S7.Net.Types
 
             return values;
         }
-        
     }
 }

@@ -29,16 +29,12 @@ namespace S7.Net.Types
         public static string FromByteArray(byte[] bytes)
         {
             if (bytes.Length < 2)
-            {
                 throw new PlcException(ErrorCode.ReadData, "Malformed S7 String / too short");
-            }
 
             int size = bytes[0];
             int length = bytes[1];
             if (length > size)
-            {
                 throw new PlcException(ErrorCode.ReadData, "Malformed S7 String / length larger than capacity");
-            }
 
             try
             {
@@ -61,19 +57,20 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(string? value, int reservedLength)
         {
             if (value is null)
-            {
                 throw new ArgumentNullException(nameof(value));
-            }
 
-            if (reservedLength > 254) throw new ArgumentException($"The maximum string length supported is 254.");
+            if (reservedLength > 254)
+                throw new ArgumentException($"The maximum string length supported is 254.");
 
             var bytes = StringEncoding.GetBytes(value);
-            if (bytes.Length > reservedLength) throw new ArgumentException($"The provided string length ({bytes.Length} is larger than the specified reserved length ({reservedLength}).");
+            if (bytes.Length > reservedLength)
+                throw new ArgumentException($"The provided string length ({bytes.Length} is larger than the specified reserved length ({reservedLength}).");
 
             var buffer = new byte[2 + reservedLength];
             Array.Copy(bytes, 0, buffer, 2, bytes.Length);
             buffer[0] = (byte)reservedLength;
             buffer[1] = (byte)bytes.Length;
+
             return buffer;
         }
     }

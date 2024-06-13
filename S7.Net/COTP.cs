@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace S7.Net
 {
-
     /// <summary>
     /// COTP Protocol functions and types
     /// </summary>
@@ -16,6 +15,7 @@ namespace S7.Net
             Data = 0xf0,
             ConnectionConfirmed = 0xd0
         }
+
         /// <summary>
         /// Describes a COTP TPDU (Transport protocol data unit)
         /// </summary>
@@ -41,12 +41,14 @@ namespace S7.Net
                         var flags = tPKT.Data[2];
                         TPDUNumber = flags & 0x7F;
                         LastDataUnit = (flags & 0x80) > 0;
-                        Data = new byte[tPKT.Data.Length - HeaderLength - 1]; // substract header length byte + header length.
+                        Data = new byte[tPKT.Data.Length - HeaderLength - 1]; // subtract header length byte + header length.
                         Array.Copy(tPKT.Data, HeaderLength + 1, Data, 0, Data.Length);
+
                         return;
                     }
                     //TODO: Handle other PDUTypes
                 }
+
                 Data = new byte[0];
             }
 
@@ -60,10 +62,10 @@ namespace S7.Net
             public static async Task<TPDU> ReadAsync(Stream stream, CancellationToken cancellationToken)
             {
                 var tpkt = await TPKT.ReadAsync(stream, cancellationToken).ConfigureAwait(false);
+
                 if (tpkt.Length == 0)
-                {
                     throw new TPDUInvalidException("No protocol data received");
-                }
+
                 return new TPDU(tpkt);
             }
 
@@ -77,7 +79,6 @@ namespace S7.Net
                     BitConverter.ToString(Data)
                     );
             }
-
         }
 
         /// <summary>
@@ -97,9 +98,7 @@ namespace S7.Net
                 var segment = await TPDU.ReadAsync(stream, cancellationToken).ConfigureAwait(false);
 
                 if (segment.LastDataUnit)
-                {
                     return segment.Data;
-                }
 
                 // More segments are expected, prepare a buffer to store all data
                 var buffer = new byte[segment.Data.Length];

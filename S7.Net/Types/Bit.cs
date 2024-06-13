@@ -9,7 +9,7 @@ namespace S7.Net.Types
     public static class Bit
     {
         /// <summary>
-        /// Converts a Bit to bool
+        /// Converts a Bit to bool.
         /// </summary>
         public static bool FromByte(byte v, byte bitAdr)
         {

@@ -22,7 +22,7 @@ namespace S7.Net.Types
         }
 
         /// <summary>
-        /// Converts an array of T repesented as S7 binary data to an array of T
+        /// Converts an array of T represented as S7 binary data to an array of T
         /// </summary>
         public static T[] ToArray<T>(byte[] bytes, Func<byte[], T> converter) where T : struct
         {
@@ -30,7 +30,7 @@ namespace S7.Net.Types
             var entries = bytes.Length / typeSize;
             var values = new T[entries];
 
-            for(int i = 0; i < entries; ++i)
+            for (int i = 0; i < entries; ++i)
             {
                 var buffer = new byte[typeSize];
                 Array.Copy(bytes, i * typeSize, buffer, 0, typeSize);

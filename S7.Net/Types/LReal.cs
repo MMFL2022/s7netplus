@@ -14,16 +14,13 @@ namespace S7.Net.Types
         public static double FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 8)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 8 bytes.");
-            }
+
             var buffer = bytes;
 
             // sps uses bigending so we have to reverse if platform needs
             if (BitConverter.IsLittleEndian)
-            {
                 Array.Reverse(buffer);
-            }
 
             return BitConverter.ToDouble(buffer, 0);
         }
@@ -37,9 +34,8 @@ namespace S7.Net.Types
 
             // sps uses bigending so we have to check if platform is same
             if (BitConverter.IsLittleEndian)
-            {
                 Array.Reverse(bytes);
-            }
+
             return bytes;
         }
 
@@ -52,6 +48,5 @@ namespace S7.Net.Types
         /// Converts an array of S7 LReal to an array of double
         /// </summary>
         public static double[] ToArray(byte[] bytes) => TypeHelper.ToArray(bytes, FromByteArray);
-        
     }
 }

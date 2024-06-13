@@ -14,16 +14,12 @@ namespace S7.Net.Types
         public static float FromByteArray(byte[] bytes)
         {
             if (bytes.Length != 4)
-            {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 4 bytes.");
-            }
 
             // sps uses bigending so we have to reverse if platform needs
             if (BitConverter.IsLittleEndian)
-            {
                 // create deep copy of the array and reverse
                 bytes = new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
-            }
 
             return BitConverter.ToSingle(bytes, 0);
         }
@@ -36,7 +32,8 @@ namespace S7.Net.Types
             byte[] bytes = BitConverter.GetBytes(value);
 
             // sps uses bigending so we have to check if platform is same
-            if (!BitConverter.IsLittleEndian) return bytes;
+            if (!BitConverter.IsLittleEndian)
+                return bytes;
             
             // create deep copy of the array and reverse
             return new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
@@ -70,6 +67,5 @@ namespace S7.Net.Types
 
             return values;
         }
-        
     }
 }

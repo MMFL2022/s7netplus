@@ -77,7 +77,8 @@ namespace S7.Net
             set
             {
                 readTimeout = value;
-                if (tcpClient != null) tcpClient.ReceiveTimeout = readTimeout;
+                if (tcpClient != null)
+                    tcpClient.ReceiveTimeout = readTimeout;
             }
         }
 
@@ -89,7 +90,8 @@ namespace S7.Net
             set
             {
                 writeTimeout = value;
-                if (tcpClient != null) tcpClient.SendTimeout = writeTimeout;
+                if (tcpClient != null)
+                    tcpClient.SendTimeout = writeTimeout;
             }
         }
 
@@ -191,7 +193,9 @@ namespace S7.Net
         {
             if (tcpClient != null)
             {
-                if (tcpClient.Connected) tcpClient.Close();
+                if (tcpClient.Connected)
+                    tcpClient.Close();
+
                 tcpClient = null; // Can not reuse TcpClient once connection gets closed.
             }
         }
@@ -200,17 +204,20 @@ namespace S7.Net
         {
             // send request limit: 19 bytes of header data, 12 bytes of parameter data for each dataItem
             var requiredRequestSize = 19 + dataItems.Count * 12;
-            if (requiredRequestSize > MaxPDUSize) throw new Exception($"Too many vars requested for read. Request size ({requiredRequestSize}) is larger than protocol limit ({MaxPDUSize}).");
+            if (requiredRequestSize > MaxPDUSize)
+                throw new Exception($"Too many vars requested for read. Request size ({requiredRequestSize}) is larger than protocol limit ({MaxPDUSize}).");
 
             // response limit: 14 bytes of header data, 4 bytes of result data for each dataItem and the actual data
             var requiredResponseSize = GetDataLength(dataItems) + dataItems.Count * 4 + 14;
-            if (requiredResponseSize > MaxPDUSize) throw new Exception($"Too much data requested for read. Response size ({requiredResponseSize}) is larger than protocol limit ({MaxPDUSize}).");
+            if (requiredResponseSize > MaxPDUSize)
+                throw new Exception($"Too much data requested for read. Response size ({requiredResponseSize}) is larger than protocol limit ({MaxPDUSize}).");
         }
 
         private void AssertPduSizeForWrite(ICollection<DataItem> dataItems)
         {
             // 12 bytes of header data, 18 bytes of parameter data for each dataItem
-            if (dataItems.Count * 18 + 12 > MaxPDUSize) throw new Exception("Too many vars supplied for write");
+            if (dataItems.Count * 18 + 12 > MaxPDUSize)
+                throw new Exception("Too many vars supplied for write");
 
             // 12 bytes of header data, 16 bytes of data for each dataItem and the actual data
             if (GetDataLength(dataItems) + dataItems.Count * 16 + 12 > MaxPDUSize)
@@ -220,9 +227,7 @@ namespace S7.Net
         private void ConfigureConnection()
         {
             if (tcpClient == null)
-            {
                 return;
-            }
 
             tcpClient.ReceiveTimeout = ReadTimeout;
             tcpClient.SendTimeout = WriteTimeout;
@@ -241,17 +246,18 @@ namespace S7.Net
 
             PlcException NotEnoughBytes() =>
                 new PlcException(ErrorCode.WrongNumberReceivedBytes,
-                    $"Received {s7Data.Length} bytes: '{BitConverter.ToString(s7Data)}', expected {expectedLength} bytes.")
-            ;
+                    $"Received {s7Data.Length} bytes: '{BitConverter.ToString(s7Data)}', expected {expectedLength} bytes.");
 
             if (s7Data == null)
                 throw new PlcException(ErrorCode.WrongNumberReceivedBytes, "No s7Data received.");
 
-            if (s7Data.Length < 15) throw NotEnoughBytes();
+            if (s7Data.Length < 15)
+                throw NotEnoughBytes();
 
             ValidateResponseCode((ReadWriteErrorCode)s7Data[14]);
 
-            if (s7Data.Length < expectedLength) throw NotEnoughBytes();
+            if (s7Data.Length < expectedLength)
+                throw NotEnoughBytes();
         }
 
         internal static void ValidateResponseCode(ReadWriteErrorCode statusCode)
@@ -280,9 +286,7 @@ namespace S7.Net
         private Stream GetStreamIfAvailable()
         {
             if (_stream == null)
-            {
                 throw new PlcException(ErrorCode.ConnectionError, "Plc is not connected");
-            }
 
             return _stream;
         }
@@ -299,9 +303,7 @@ namespace S7.Net
             if (!disposedValue)
             {
                 if (disposing)
-                {
                     Close();
-                }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
@@ -325,6 +327,5 @@ namespace S7.Net
             // GC.SuppressFinalize(this);
         }
         #endregion
-
     }
 }

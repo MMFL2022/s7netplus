@@ -69,10 +69,8 @@ namespace S7.Net
             var response = await NoLockRequestTpduAsync(stream, requestData, cancellationToken).ConfigureAwait(false);
 
             if (response.PDUType != COTP.PduType.ConnectionConfirmed)
-            {
                 throw new InvalidDataException("Connection request was denied", response.TPkt.Data, 1, 0x0d);
             }
-        }
 
         private async Task SetupConnection(Stream stream, CancellationToken cancellationToken)
         {
@@ -156,6 +154,7 @@ namespace S7.Net
         {
             int cntBytes = VarTypeToByteLength(varType, varCount);
             byte[] bytes = await ReadBytesAsync(dataType, db, startByteAdr, cntBytes, cancellationToken).ConfigureAwait(false);
+
             return ParseBytes(varType, bytes, varCount, bitAdr);
         }
 
@@ -170,6 +169,7 @@ namespace S7.Net
         public async Task<object?> ReadAsync(string variable, CancellationToken cancellationToken = default)
         {
             var adr = new PLCAddress(variable);
+
             return await ReadAsync(adr.DataType, adr.DbNumber, adr.StartByte, adr.VarType, 1, (byte)adr.BitNumber, cancellationToken).ConfigureAwait(false);
         }
 
@@ -220,9 +220,7 @@ namespace S7.Net
         {
             int numBytes = (int)Class.GetClassSize(sourceClass);
             if (numBytes <= 0)
-            {
                 throw new Exception("The size of the class is less than 1 byte and therefore cannot be read");
-            }
 
             // now read the package
             var resultBytes = await ReadBytesAsync(DataType.DataBlock, db, startByteAdr, numBytes, cancellationToken).ConfigureAwait(false);
@@ -265,9 +263,7 @@ namespace S7.Net
             var res = await ReadClassAsync(instance, db, startByteAdr, cancellationToken).ConfigureAwait(false);
             int readBytes = res.Item1;
             if (readBytes <= 0)
-            {
                 return null;
-            }
 
             return (T)res.Item2;
         }
@@ -279,7 +275,7 @@ namespace S7.Net
         /// If you don't want the conversion, just create a dataItem of bytes.
         /// The number of DataItems as well as the total size of the requested data can not exceed a certain limit (protocol restriction).
         /// </summary>
-        /// <param name="dataItems">List of dataitems that contains the list of variables that must be read.</param>
+        /// <param name="dataItems">List of data items that contains the list of variables that must be read.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is None.
         /// Please note that cancellation is advisory/cooperative and will not lead to immediate cancellation in all cases.</param>
         public async Task<List<DataItem>> ReadMultipleVarsAsync(List<DataItem> dataItems, CancellationToken cancellationToken = default)
@@ -309,6 +305,7 @@ namespace S7.Net
             {
                 throw new PlcException(ErrorCode.ReadData, exc);
             }
+
             return dataItems;
         }
 
@@ -408,7 +405,7 @@ namespace S7.Net
         public async Task WriteBitAsync(DataType dataType, int db, int startByteAdr, int bitAdr, bool value, CancellationToken cancellationToken = default)
         {
             if (bitAdr < 0 || bitAdr > 7)
-                throw new InvalidAddressException(string.Format("Addressing Error: You can only reference bitwise locations 0-7. Address {0} is invalid", bitAdr));
+                throw new InvalidAddressException($"Addressing Error: You can only reference bitwise locations 0-7. Address {bitAdr} is invalid");
 
             await WriteBitWithASingleRequestAsync(dataType, db, startByteAdr, bitAdr, value, cancellationToken).ConfigureAwait(false);
         }
@@ -440,7 +437,7 @@ namespace S7.Net
         /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Merker(Memory), Input, Output.</param>
         /// <param name="db">Address of the memory area (if you want to read DB1, this is set to 1). This must be set also for other memory area types: counters, timers,etc.</param>
         /// <param name="startByteAdr">Start byte address. If you want to read DB1.DBW200, this is 200.</param>
-        /// <param name="value">Bytes to write. The lenght of this parameter can't be higher than 200. If you need more, use recursion.</param>
+        /// <param name="value">Bytes to write. The length of this parameter can't be higher than 200. If you need more, use recursion.</param>
         /// <param name="bitAdr">The address of the bit. (0-7)</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is None.
         /// Please note that cancellation is advisory/cooperative and will not lead to immediate cancellation in all cases.</param>
@@ -451,9 +448,8 @@ namespace S7.Net
             {
                 //Must be writing a bit value as bitAdr is specified
                 if (value is bool boolean)
-                {
                     await WriteBitAsync(dataType, db, startByteAdr, bitAdr, boolean, cancellationToken).ConfigureAwait(false);
-                }
+
                 else if (value is int intValue)
                 {
                     if (intValue < 0 || intValue > 7)
@@ -464,9 +460,11 @@ namespace S7.Net
 
                     await WriteBitAsync(dataType, db, startByteAdr, bitAdr, intValue == 1, cancellationToken).ConfigureAwait(false);
                 }
-                else throw new ArgumentException("Value must be a bool or an int to write a bit", nameof(value));
+                else
+                    throw new ArgumentException("Value must be a bool or an int to write a bit", nameof(value));
             }
-            else await WriteBytesAsync(dataType, db, startByteAdr, Serialization.SerializeValue(value), cancellationToken).ConfigureAwait(false);
+            else 
+                await WriteBytesAsync(dataType, db, startByteAdr, Serialization.SerializeValue(value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -600,8 +598,7 @@ namespace S7.Net
                 NoLockRequestTsduAsync(stream, requestData, offset, length, cancellationToken));
         }
 
-        private async Task<COTP.TPDU> NoLockRequestTpduAsync(Stream stream, byte[] requestData,
-            CancellationToken cancellationToken = default)
+        private async Task<COTP.TPDU> NoLockRequestTpduAsync(Stream stream, byte[] requestData, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -621,8 +618,7 @@ namespace S7.Net
             }
         }
 
-        private async Task<byte[]> NoLockRequestTsduAsync(Stream stream, byte[] requestData, int offset, int length,
-            CancellationToken cancellationToken = default)
+        private async Task<byte[]> NoLockRequestTsduAsync(Stream stream, byte[] requestData, int offset, int length, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
