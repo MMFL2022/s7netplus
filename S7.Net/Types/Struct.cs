@@ -1,6 +1,8 @@
-﻿using System;
+﻿using S7.Net.Helper;
+using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace S7.Net.Types
 {
@@ -14,7 +16,7 @@ namespace S7.Net.Types
         /// </summary>
         /// <param name="structType">the type of the struct</param>
         /// <returns>the number of bytes</returns>
-        public static int GetStructSize(Type structType)
+        public static int GetStructSize(Type structType, CpuType cpu)
         {
             double numBytes = 0.0;
 
@@ -38,43 +40,52 @@ namespace S7.Net.Types
                         break;
                     case "Int16":
                     case "UInt16":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         numBytes += 2;
                         break;
                     case "Int32":
                     case "UInt32":
                     case "TimeSpan":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         numBytes += 4;
                         break;
                     case "Single":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         numBytes += 4;
                         break;
                     case "Double":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         numBytes += 8;
+                        break;
+                    case "DateTime":
+                        // https://support.industry.siemens.com/cs/document/43566349/in-step-7-(tia-portal)-how-can-you-input-read-out-and-edit-the-date-and-time-for-the-cpu-modules-?dti=0&lc=en-WW
+                        // Per Siemens documentation, DateTime structures are model specific, and compatibility to exchange types
+                        // is not supported by Siemens.
+                        S7DateTimeAttribute? dateAttribute = info.GetCustomAttributes<S7DateTimeAttribute>().SingleOrDefault();
+
+                        if (dateAttribute == default(S7DateTimeAttribute))
+                            throw new ArgumentException($"Please add {nameof(S7DateTimeAttribute)} to the datetime field {info.Name} in class {info.DeclaringType.Name}.");
+                        else if (dateAttribute == null)
+                            dateAttribute = cpu switch
+                            {
+                                CpuType.S71200 => new S7DateTimeAttribute(S7DateTimeType.DTL),
+                                CpuType.S71500 => new S7DateTimeAttribute(S7DateTimeType.DTL),
+                                _ => new S7DateTimeAttribute(S7DateTimeType.DT),
+                            };
+
+                        ByteHelper.IncrementToEven(ref numBytes);
+                        numBytes += dateAttribute.ByteLength;
                         break;
                     case "String":
                         S7StringAttribute? attribute = info.GetCustomAttributes<S7StringAttribute>().SingleOrDefault();
                         if (attribute == default(S7StringAttribute))
-                            throw new ArgumentException("Please add S7StringAttribute to the string field");
+                            throw new ArgumentException($"Please add {nameof(S7StringAttribute)} to the string field {info.Name} in class {info.DeclaringType.Name}.");
 
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         numBytes += attribute.ReservedLengthInBytes;
                         break;
                     default:
-                        numBytes += GetStructSize(info.FieldType);
+                        numBytes += GetStructSize(info.FieldType, cpu);
                         break;
                 }
             }
@@ -87,12 +98,12 @@ namespace S7.Net.Types
         /// <param name="structType">The struct type</param>
         /// <param name="bytes">The array of bytes</param>
         /// <returns>The object depending on the struct type or null if fails(array-length != struct-length</returns>
-        public static object? FromBytes(Type structType, byte[] bytes)
+        public static object? FromBytes(Type structType, byte[] bytes, CpuType cpu)
         {
             if (bytes == null)
                 return null;
 
-            if (bytes.Length != GetStructSize(structType))
+            if (bytes.Length != GetStructSize(structType, cpu))
                 return null;
 
             // and decode it
@@ -190,14 +201,63 @@ namespace S7.Net.Types
                         info.SetValue(structValue, LReal.FromByteArray(data));
                         numBytes += 8;
                         break;
-                    case "String":
-                        S7StringAttribute? attribute = info.GetCustomAttributes<S7StringAttribute>().SingleOrDefault();
-                        if (attribute == default(S7StringAttribute))
-                            throw new ArgumentException("Please add S7StringAttribute to the string field");
-
+                    case "DateTime":
                         numBytes = Math.Ceiling(numBytes);
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
+                        // https://support.industry.siemens.com/cs/document/43566349/in-step-7-(tia-portal)-how-can-you-input-read-out-and-edit-the-date-and-time-for-the-cpu-modules-?dti=0&lc=en-WW
+                        // Per Siemens documentation, DateTime structures are model specific, and compatibility to exchange types
+                        // is not supported by Siemens.
+
+                        // If the property does not have a S7DateTimeAttribute set, then set a default attribute based on what
+                        // the CPU's default DateTime parsing mechanism is
+
+                        S7DateTimeAttribute? dateAttribute = info?.GetCustomAttributes<S7DateTimeAttribute>().SingleOrDefault();
+
+                        if (dateAttribute == default(S7DateTimeAttribute))
+                            throw new ArgumentException($"Please add {nameof(S7DateTimeAttribute)} to the datetime field {info.Name} in class {info.DeclaringType.Name}.");
+                        else if (dateAttribute == null)
+                            dateAttribute = cpu switch
+                            {
+                                CpuType.S71200 => new S7DateTimeAttribute(S7DateTimeType.DTL),
+                                _ => new S7DateTimeAttribute(S7DateTimeType.DT),
+                            };
+
+                        ByteHelper.IncrementToEven(ref numBytes);
+
+                        // get the value
+                        var dateData = new byte[dateAttribute.ByteLength];
+                        Array.Copy(bytes, (int)numBytes, dateData, 0, dateData.Length);
+
+                        switch (cpu)
+                        {
+                            case CpuType.S71500:
+                                var dateTime = dateAttribute.Type switch
+                                {
+                                    S7DateTimeType.DTL => DateTimeLong.FromByteArray(dateData),
+                                    _ => DateTime.FromByteArray(dateData)
+                                };
+                                info.SetValue(structValue, dateTime);
+                                break;
+                            case CpuType.S71200:
+                                info.SetValue(structValue, DateTimeLong.FromByteArray(dateData));
+                                break;
+                            default:
+                                info.SetValue(structValue, DateTime.FromByteArray(dateData));
+                                break;
+                        }
+
+                        numBytes += dateData.Length;
+                        break;
+                    case "String":
+                        S7StringAttribute? attribute = info?.GetCustomAttributes<S7StringAttribute>().SingleOrDefault();
+
+                        if (attribute == default(S7StringAttribute))
+                            throw new ArgumentException($"Please add {nameof(S7StringAttribute)} to the string field {info.Name} in class {info.DeclaringType.Name}.");
+                        else if (attribute == null)
+                            attribute = new S7StringAttribute(S7StringType.S7String, 254);
+
+                        ByteHelper.IncrementToEven(ref numBytes);
 
                         // get the value
                         var sData = new byte[attribute.ReservedLengthInBytes];
@@ -211,7 +271,7 @@ namespace S7.Net.Types
                                 info.SetValue(structValue, S7WString.FromByteArray(sData));
                                 break;
                             default:
-                                throw new ArgumentException("Please use a valid string type for the S7StringAttribute");
+                                throw new ArgumentException($"Please use a valid string type for the {nameof(S7StringAttribute)} on property {info.Name} in class {info.DeclaringType.Name}.");
                         }
 
                         numBytes += sData.Length;
@@ -232,11 +292,13 @@ namespace S7.Net.Types
                         numBytes += 4;
                         break;
                     default:
-                        var buffer = new byte[GetStructSize(info.FieldType)];
+                        var buffer = new byte[GetStructSize(info.FieldType, cpu)];
+
                         if (buffer.Length == 0)
                             continue;
+
                         Buffer.BlockCopy(bytes, (int)Math.Ceiling(numBytes), buffer, 0, buffer.Length);
-                        info.SetValue(structValue, FromBytes(info.FieldType, buffer));
+                        info.SetValue(structValue, FromBytes(info.FieldType, buffer, cpu));
                         numBytes += buffer.Length;
                         break;
                 }
@@ -249,11 +311,11 @@ namespace S7.Net.Types
         /// </summary>
         /// <param name="structValue">The struct object</param>
         /// <returns>A byte array or null if fails.</returns>
-        public static byte[] ToBytes(object structValue)
+        public static byte[] ToBytes(object structValue, CpuType cpu)
         {
             Type type = structValue.GetType();
 
-            int size = Struct.GetStructSize(type);
+            int size = Struct.GetStructSize(type, cpu);
             byte[] bytes = new byte[size];
             byte[]? bytes2 = null;
 
@@ -315,22 +377,43 @@ namespace S7.Net.Types
                     case "Double":
                         bytes2 = LReal.ToByteArray(GetValueOrThrow<double>(info, structValue));
                         break;
+                    case "DateTime":
+                        S7DateTimeAttribute? dateAttribute = info?.GetCustomAttributes<S7DateTimeAttribute>().SingleOrDefault();
+
+                        if (dateAttribute == default(S7DateTimeAttribute))
+                            throw new ArgumentException($"Please add {nameof(S7DateTimeAttribute)} to the datetime field {info.Name} in class {info.DeclaringType.Name}.");
+                        else if (dateAttribute == null)
+                            dateAttribute = cpu switch
+                            {
+                                CpuType.S71200 => new S7DateTimeAttribute(S7DateTimeType.DTL),
+                                _ => new S7DateTimeAttribute(S7DateTimeType.DT),
+                            };
+
+                        bytes2 = dateAttribute.Type switch
+                        {
+                            S7DateTimeType.DTL => DateTimeLong.ToByteArray((System.DateTime)info.GetValue(structValue)),
+                            _ => DateTime.ToByteArray((System.DateTime)info.GetValue(structValue))
+                        };
+
+                        break;
                     case "String":
-                        S7StringAttribute? attribute = info.GetCustomAttributes<S7StringAttribute>().SingleOrDefault();
+                        S7StringAttribute? attribute = info?.GetCustomAttributes<S7StringAttribute>().SingleOrDefault();
+
                         if (attribute == default(S7StringAttribute))
-                            throw new ArgumentException("Please add S7StringAttribute to the string field");
+                            throw new ArgumentException($"Please add {nameof(S7StringAttribute)} to the string field {info.Name} in class {info.DeclaringType.Name}.");
 
                         bytes2 = attribute.Type switch
                         {
                             S7StringType.S7String => S7String.ToByteArray((string?)info.GetValue(structValue), attribute.ReservedLength),
                             S7StringType.S7WString => S7WString.ToByteArray((string?)info.GetValue(structValue), attribute.ReservedLength),
-                            _ => throw new ArgumentException("Please use a valid string type for the S7StringAttribute")
+                            _ => throw new ArgumentException($"Please use a valid string type for the {nameof(S7StringAttribute)} on property {info.Name} in class {info.DeclaringType.Name}.")
                         };
                         break;
                     case "TimeSpan":
                         bytes2 = TimeSpan.ToByteArray((System.TimeSpan)info.GetValue(structValue));
                         break;
                 }
+
                 if (bytes2 != null)
                 {
                     // add them
@@ -343,6 +426,7 @@ namespace S7.Net.Types
                     numBytes += bytes2.Length;
                 }
             }
+
             return bytes;
         }
     }

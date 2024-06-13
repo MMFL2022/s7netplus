@@ -252,6 +252,18 @@ namespace S7.Net
         }
 
         /// <summary>
+        /// Converts from ulong value to long value; it's used to retrieve negative values from words
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static long ConvertToLong(this ulong input)
+        {
+            long output;
+            output = long.Parse(input.ToString("X"), NumberStyles.HexNumber);
+            return output;
+        }
+
+        /// <summary>
         /// Converts from DWord (DBD) to float
         /// </summary>
         /// <param name="input"></param>

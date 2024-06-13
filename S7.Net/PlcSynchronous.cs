@@ -107,12 +107,12 @@ namespace S7.Net
         /// <returns>Returns a struct that must be cast. If no data has been read, null will be returned</returns>
         public object? ReadStruct(Type structType, int db, int startByteAdr = 0)
         {
-            int numBytes = Struct.GetStructSize(structType);
+            int numBytes = Struct.GetStructSize(structType, CPU);
             // now read the package
             var resultBytes = ReadBytes(DataType.DataBlock, db, startByteAdr, numBytes);
 
             // and decode it
-            return Struct.FromBytes(structType, resultBytes);
+            return Struct.FromBytes(structType, resultBytes, CPU);
         }
 
         /// <summary>
@@ -137,14 +137,15 @@ namespace S7.Net
         /// <returns>The number of read bytes</returns>
         public int ReadClass(object sourceClass, int db, int startByteAdr = 0)
         {
-            int numBytes = (int)Class.GetClassSize(sourceClass);
+            int numBytes = (int)Class.GetClassSize(sourceClass, cpu: CPU);
             if (numBytes <= 0)
                 throw new Exception("The size of the class is less than 1 byte and therefore cannot be read");
 
             // now read the package
             var resultBytes = ReadBytes(DataType.DataBlock, db, startByteAdr, numBytes);
             // and decode it
-            Class.FromBytes(sourceClass, resultBytes);
+            Class.FromBytes(sourceClass, resultBytes, cpu: CPU);
+
             return resultBytes.Length;
         }
 

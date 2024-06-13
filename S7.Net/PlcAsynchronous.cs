@@ -70,7 +70,7 @@ namespace S7.Net
 
             if (response.PDUType != COTP.PduType.ConnectionConfirmed)
                 throw new InvalidDataException("Connection request was denied", response.TPkt.Data, 1, 0x0d);
-            }
+        }
 
         private async Task SetupConnection(Stream stream, CancellationToken cancellationToken)
         {
@@ -184,12 +184,12 @@ namespace S7.Net
         /// <returns>Returns a struct that must be cast.</returns>
         public async Task<object?> ReadStructAsync(Type structType, int db, int startByteAdr = 0, CancellationToken cancellationToken = default)
         {
-            int numBytes = Types.Struct.GetStructSize(structType);
+            int numBytes = Types.Struct.GetStructSize(structType, CPU);
             // now read the package
             var resultBytes = await ReadBytesAsync(DataType.DataBlock, db, startByteAdr, numBytes, cancellationToken).ConfigureAwait(false);
 
             // and decode it
-            return Types.Struct.FromBytes(structType, resultBytes);
+            return Types.Struct.FromBytes(structType, resultBytes, CPU);
         }
 
         /// <summary>
@@ -218,14 +218,15 @@ namespace S7.Net
         /// <returns>The number of read bytes</returns>
         public async Task<Tuple<int, object>> ReadClassAsync(object sourceClass, int db, int startByteAdr = 0, CancellationToken cancellationToken = default)
         {
-            int numBytes = (int)Class.GetClassSize(sourceClass);
+            int numBytes = (int)Class.GetClassSize(sourceClass, cpu: CPU);
+
             if (numBytes <= 0)
                 throw new Exception("The size of the class is less than 1 byte and therefore cannot be read");
 
             // now read the package
             var resultBytes = await ReadBytesAsync(DataType.DataBlock, db, startByteAdr, numBytes, cancellationToken).ConfigureAwait(false);
             // and decode it
-            Class.FromBytes(sourceClass, resultBytes);
+            Class.FromBytes(sourceClass, resultBytes, cpu: CPU);
 
             return new Tuple<int, object>(resultBytes.Length, sourceClass);
         }
@@ -492,7 +493,7 @@ namespace S7.Net
         /// <returns>A task that represents the asynchronous write operation.</returns>
         public async Task WriteStructAsync(object structValue, int db, int startByteAdr = 0, CancellationToken cancellationToken = default)
         {
-            var bytes = Struct.ToBytes(structValue).ToList();
+            var bytes = Struct.ToBytes(structValue, CPU).ToList();
             await WriteBytesAsync(DataType.DataBlock, db, startByteAdr, bytes.ToArray(), cancellationToken).ConfigureAwait(false);
         }
 
