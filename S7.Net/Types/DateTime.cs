@@ -110,7 +110,7 @@ namespace S7.Net.Types
         {
             byte EncodeBcd(int value)
             {
-                return (byte) ((value / 10 << 4) | value % 10);
+                return (byte)((value / 10 << 4) | value % 10);
             }
 
             if (dateTime < SpecMinimumDateTime)
@@ -121,9 +121,9 @@ namespace S7.Net.Types
                 throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime,
                     $"DateTime '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 date time representation.");
 
-            byte MapYear(int year) => (byte) (year < 2000 ? year - 1900 : year - 2000);
+            byte MapYear(int year) => (byte)(year < 2000 ? year - 1900 : year - 2000);
 
-            int DayOfWeekToInt(DayOfWeek dayOfWeek) => (int) dayOfWeek + 1;
+            int DayOfWeekToInt(DayOfWeek dayOfWeek) => (int)dayOfWeek + 1;
 
             return new[]
             {
@@ -149,7 +149,8 @@ namespace S7.Net.Types
         public static byte[] ToByteArray(System.DateTime[] dateTimes)
         {
             var bytes = new List<byte>(dateTimes.Length * 8);
-            foreach (var dateTime in dateTimes) bytes.AddRange(ToByteArray(dateTime));
+            foreach (var dateTime in dateTimes)
+                bytes.AddRange(ToByteArray(dateTime));
 
             return bytes.ToArray();
         }

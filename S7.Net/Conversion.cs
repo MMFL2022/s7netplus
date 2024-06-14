@@ -18,9 +18,8 @@ namespace S7.Net
             int ret = 0;
 
             for (int i = 0; i < txt.Length; i++)
-            {
                 ret = (ret << 1) | ((txt[i] == '1') ? 1 : 0);
-            }
+
             return ret;
         }
 
@@ -31,7 +30,9 @@ namespace S7.Net
         /// <returns></returns>
         public static byte? BinStringToByte(this string txt)
         {
-            if (txt.Length == 8) return (byte)BinStringToInt32(txt);
+            if (txt.Length == 8)
+                return (byte)BinStringToInt32(txt);
+
             return null;
         }
 
@@ -128,6 +129,7 @@ namespace S7.Net
                             throw new Exception();
                     }
                 }
+
                 return txt;
             }
             catch
@@ -175,9 +177,7 @@ namespace S7.Net
         public static void SetBit(this ref byte data, int index, bool value)
         {
             if ((uint)index > 7)
-            {
                 return;
-            }
 
             if (value)
             {
@@ -200,6 +200,7 @@ namespace S7.Net
         {
             short output;
             output = short.Parse(input.ToString("X"), NumberStyles.HexNumber);
+
             return output;
         }
 
@@ -212,6 +213,7 @@ namespace S7.Net
         {
             ushort output;
             output = ushort.Parse(input.ToString("X"), NumberStyles.HexNumber);
+
             return output;
         }
 
@@ -224,6 +226,7 @@ namespace S7.Net
         {
             int output;
             output = int.Parse(input.ToString("X"), NumberStyles.HexNumber);
+
             return output;
         }
 
@@ -236,6 +239,7 @@ namespace S7.Net
         {
             uint output;
             output = uint.Parse(input.ToString("X"), NumberStyles.HexNumber);
+
             return output;
         }
 
@@ -248,6 +252,7 @@ namespace S7.Net
         {
             uint output;
             output = S7.Net.Types.DWord.FromByteArray(S7.Net.Types.Real.ToByteArray(input));
+
             return output;
         }
 
@@ -260,6 +265,7 @@ namespace S7.Net
         {
             long output;
             output = long.Parse(input.ToString("X"), NumberStyles.HexNumber);
+
             return output;
         }
 
@@ -272,6 +278,7 @@ namespace S7.Net
         {
             float output;
             output = S7.Net.Types.Real.FromByteArray(S7.Net.Types.DWord.ToByteArray(input));
+
             return output;
         }
     }

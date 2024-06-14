@@ -108,6 +108,7 @@ namespace S7.Net.Types
                     $"DateTime '{dateTime}' is after the maximum '{SpecMaximumDateTime}' supported in S7 DateTimeLong representation.");
 
             var stream = new MemoryStream(TypeLengthInBytes);
+
             // Convert Year
             stream.Write(Word.ToByteArray(Convert.ToUInt16(dateTime.Year)), 0, 2);
 
@@ -150,9 +151,7 @@ namespace S7.Net.Types
         {
             var bytes = new List<byte>(dateTimes.Length * TypeLengthInBytes);
             foreach (var dateTime in dateTimes)
-            {
                 bytes.AddRange(ToByteArray(dateTime));
-            }
 
             return bytes.ToArray();
         }

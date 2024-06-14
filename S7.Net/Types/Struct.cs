@@ -89,6 +89,7 @@ namespace S7.Net.Types
                         break;
                 }
             }
+
             return (int)numBytes;
         }
 
@@ -140,27 +141,21 @@ namespace S7.Net.Types
                         numBytes++;
                         break;
                     case "Int16":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         ushort source = Word.FromBytes(bytes[(int)numBytes + 1], bytes[(int)numBytes]);
                         info.SetValue(structValue, source.ConvertToShort());
                         numBytes += 2;
                         break;
                     case "UInt16":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         info.SetValue(structValue, Word.FromBytes(bytes[(int)numBytes + 1],
                                                                           bytes[(int)numBytes]));
                         numBytes += 2;
                         break;
                     case "Int32":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         uint sourceUInt = DWord.FromBytes(bytes[(int)numBytes + 3],
                                                                            bytes[(int)numBytes + 2],
@@ -170,9 +165,7 @@ namespace S7.Net.Types
                         numBytes += 4;
                         break;
                     case "UInt32":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         info.SetValue(structValue, DWord.FromBytes(bytes[(int)numBytes],
                                                                            bytes[(int)numBytes + 1],
@@ -181,9 +174,7 @@ namespace S7.Net.Types
                         numBytes += 4;
                         break;
                     case "Single":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         info.SetValue(structValue, Real.FromByteArray(new byte[] { bytes[(int)numBytes],
                                                                            bytes[(int)numBytes + 1],
@@ -192,9 +183,7 @@ namespace S7.Net.Types
                         numBytes += 4;
                         break;
                     case "Double":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // get the value
                         var data = new byte[8];
                         Array.Copy(bytes, (int)numBytes, data, 0, 8);
@@ -202,9 +191,7 @@ namespace S7.Net.Types
                         numBytes += 8;
                         break;
                     case "DateTime":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
+                        ByteHelper.IncrementToEven(ref numBytes);
                         // https://support.industry.siemens.com/cs/document/43566349/in-step-7-(tia-portal)-how-can-you-input-read-out-and-edit-the-date-and-time-for-the-cpu-modules-?dti=0&lc=en-WW
                         // Per Siemens documentation, DateTime structures are model specific, and compatibility to exchange types
                         // is not supported by Siemens.
@@ -277,12 +264,10 @@ namespace S7.Net.Types
                         numBytes += sData.Length;
                         break;
                     case "TimeSpan":
-                        numBytes = Math.Ceiling(numBytes);
-                        if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                            numBytes++;
-                        
+                        ByteHelper.IncrementToEven(ref numBytes);
+
                         // get the value
-                        info.SetValue(structValue, TimeSpan.FromByteArray(new[] 
+                        info.SetValue(structValue, TimeSpan.FromByteArray(new[]
                         {
                             bytes[(int)numBytes + 0],
                             bytes[(int)numBytes + 1],
@@ -417,12 +402,12 @@ namespace S7.Net.Types
                 if (bytes2 != null)
                 {
                     // add them
-                    numBytes = Math.Ceiling(numBytes);
-                    if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                        numBytes++;
+                    ByteHelper.IncrementToEven(ref numBytes);
                     bytePos = (int)numBytes;
+
                     for (int bCnt = 0; bCnt < bytes2.Length; bCnt++)
                         bytes[bytePos + bCnt] = bytes2[bCnt];
+
                     numBytes += bytes2.Length;
                 }
             }

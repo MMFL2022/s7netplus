@@ -95,6 +95,7 @@ namespace S7.Net
         public object? Read(string variable)
         {
             var adr = new PLCAddress(variable);
+
             return Read(adr.DataType, adr.DbNumber, adr.StartByte, adr.VarType, 1, (byte)adr.BitNumber);
         }
 
@@ -237,7 +238,7 @@ namespace S7.Net
         /// <summary>
         /// Write a single bit to a DB with the specified index.
         /// </summary>
-        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Merker(Memory), Input, Output.</param>
+        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Marker(Memory), Input, Output.</param>
         /// <param name="db">Address of the memory area (if you want to write DB1, this is set to 1). This must be set also for other memory area types: counters, timers,etc.</param>
         /// <param name="startByteAdr">Start byte address. If you want to write DB1.DBW200, this is 200.</param>
         /// <param name="bitAdr">The address of the bit. (0-7)</param>
@@ -255,10 +256,10 @@ namespace S7.Net
         /// You must specify the memory area type, memory are address, byte start address and bytes count.
         /// If the read was not successful, check LastErrorCode or LastErrorString.
         /// </summary>
-        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Merker(Memory), Input, Output.</param>
+        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Marker(Memory), Input, Output.</param>
         /// <param name="db">Address of the memory area (if you want to read DB1, this is set to 1). This must be set also for other memory area types: counters, timers,etc.</param>
         /// <param name="startByteAdr">Start byte address. If you want to read DB1.DBW200, this is 200.</param>
-        /// <param name="value">Bytes to write. The lenght of this parameter can't be higher than 200. If you need more, use recursion.</param>
+        /// <param name="value">Bytes to write. The length of this parameter can't be higher than 200. If you need more, use recursion.</param>
         /// <param name="bitAdr">The address of the bit. (0-7)</param>
         public void Write(DataType dataType, int db, int startByteAdr, object value, int bitAdr = -1)
         {
@@ -458,7 +459,7 @@ namespace S7.Net
         /// If you don't want the conversion, just create a dataItem of bytes.
         /// The number of DataItems as well as the total size of the requested data can not exceed a certain limit (protocol restriction).
         /// </summary>
-        /// <param name="dataItems">List of dataitems that contains the list of variables that must be read.</param>
+        /// <param name="dataItems">List of data items that contains the list of variables that must be read.</param>
         public void ReadMultipleVars(List<DataItem> dataItems)
         {
             AssertPduSizeForRead(dataItems);
@@ -521,7 +522,7 @@ namespace S7.Net
             var dataToSend = BuildSzlReadRequestPackage(0x0424, 0);
             var s7data = RequestTsdu(dataToSend);
 
-            return (byte) (s7data[37] & 0x0f);
+            return (byte)(s7data[37] & 0x0f);
         }
 
         private byte[] RequestTsdu(byte[] requestData) => RequestTsdu(requestData, 0, requestData.Length);

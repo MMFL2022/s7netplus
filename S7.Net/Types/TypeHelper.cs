@@ -14,9 +14,7 @@ namespace S7.Net.Types
             var buffer = new byte[Marshal.SizeOf(default(T)) * value.Length];
             var stream = new MemoryStream(buffer);
             foreach (var val in value)
-            {
                 stream.Write(converter(val), 0, 4);
-            }
 
             return buffer;
         }

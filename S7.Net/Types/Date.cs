@@ -34,10 +34,8 @@ namespace S7.Net.Types
 
             var daysSinceDateStart = Word.FromByteArray(bytes);
             if (daysSinceDateStart > MaxNumberOfDays)
-            {
                 throw new ArgumentException($"Read number exceeded the number of maximum days in the IEC date (read: {daysSinceDateStart}, max: {MaxNumberOfDays})", 
                     nameof(bytes));
-            }
             
             return IecMinDate.AddDays(daysSinceDateStart);
         }

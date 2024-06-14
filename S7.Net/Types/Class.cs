@@ -11,7 +11,7 @@ namespace S7.Net.Types
     /// </summary>
     public static class Class
     {
-        private static IEnumerable<PropertyInfo> GetAccessableProperties(Type classType)
+        private static IEnumerable<PropertyInfo> GetAccessibleProperties(Type classType)
         {
             return classType
 #if NETSTANDARD1_3
@@ -110,7 +110,7 @@ namespace S7.Net.Types
         /// <returns>the number of bytes</returns>
         public static double GetClassSize(object instance, double numBytes = 0.0, bool isInnerProperty = false, CpuType cpu = CpuType.S71500)
         {
-            var properties = GetAccessableProperties(instance.GetType());
+            var properties = GetAccessibleProperties(instance.GetType());
             foreach (var property in properties)
             {
                 if (property.PropertyType.IsArray)
@@ -241,9 +241,7 @@ namespace S7.Net.Types
                     numBytes += 8;
                     break;
                 case "DateTime":
-                    numBytes = Math.Ceiling(numBytes);
-                    if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
-                        numBytes++;
+                    ByteHelper.IncrementToEven(ref numBytes);
                     // https://support.industry.siemens.com/cs/document/43566349/in-step-7-(tia-portal)-how-can-you-input-read-out-and-edit-the-date-and-time-for-the-cpu-modules-?dti=0&lc=en-WW
                     // Per Siemens documentation, DateTime structures are model specific, and compatibility to exchange types
                     // is not supported by Siemens.
@@ -333,7 +331,7 @@ namespace S7.Net.Types
             if (bytes == null)
                 return numBytes;
 
-            var properties = GetAccessableProperties(sourceClass.GetType());
+            var properties = GetAccessibleProperties(sourceClass.GetType());
             foreach (var property in properties)
             {
                 if (property.PropertyType.IsArray)
@@ -472,7 +470,7 @@ namespace S7.Net.Types
         /// <returns>A byte array or null if fails.</returns>
         public static double ToBytes(object sourceClass, byte[] bytes, double numBytes = 0.0, CpuType cpu = CpuType.S71500)
         {
-            var properties = GetAccessableProperties(sourceClass.GetType());
+            var properties = GetAccessibleProperties(sourceClass.GetType());
             foreach (var property in properties)
             {
                 var value = property.GetValue(sourceClass, null) ??

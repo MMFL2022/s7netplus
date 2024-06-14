@@ -191,12 +191,12 @@
                             varType = VarType.Counter;
                             return;
                         default:
-                            throw new InvalidAddressException(string.Format("{0} is not a valid address", input.Substring(0, 1)));
+                            throw new InvalidAddressException($"{input.Substring(0, 1)} is not a valid address");
                     }
 
                     string txt2 = input.Substring(1);
                     if (txt2.IndexOf(".") == -1)
-                        throw new InvalidAddressException("To few periods for DB address");
+                        throw new InvalidAddressException("Too few periods for DB address");
 
                     address = int.Parse(txt2.Substring(0, txt2.IndexOf(".")));
                     bitNumber = int.Parse(txt2.Substring(txt2.IndexOf(".") + 1));

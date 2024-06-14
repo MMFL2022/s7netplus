@@ -350,7 +350,7 @@ namespace S7.Net
             var dataToSend = BuildSzlReadRequestPackage(0x0424, 0);
             var s7data = await RequestTsduAsync(dataToSend, cancellationToken);
 
-            return (byte) (s7data[37] & 0x0f);
+            return (byte)(s7data[37] & 0x0f);
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace S7.Net
         /// <summary>
         /// Write a single bit from a DB with the specified index.
         /// </summary>
-        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Merker(Memory), Input, Output.</param>
+        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Marker(Memory), Input, Output.</param>
         /// <param name="db">Address of the memory area (if you want to read DB1, this is set to 1). This must be set also for other memory area types: counters, timers,etc.</param>
         /// <param name="startByteAdr">Start byte address. If you want to write DB1.DBW200, this is 200.</param>
         /// <param name="bitAdr">The address of the bit. (0-7)</param>
@@ -454,17 +454,14 @@ namespace S7.Net
                 else if (value is int intValue)
                 {
                     if (intValue < 0 || intValue > 7)
-                        throw new ArgumentOutOfRangeException(
-                            string.Format(
-                                "Addressing Error: You can only reference bitwise locations 0-7. Address {0} is invalid",
-                                bitAdr), nameof(bitAdr));
+                        throw new ArgumentOutOfRangeException($"Addressing Error: You can only reference bitwise locations 0-7. Address {nameof(bitAdr)} is invalid");
 
                     await WriteBitAsync(dataType, db, startByteAdr, bitAdr, intValue == 1, cancellationToken).ConfigureAwait(false);
                 }
                 else
                     throw new ArgumentException("Value must be a bool or an int to write a bit", nameof(value));
             }
-            else 
+            else
                 await WriteBytesAsync(dataType, db, startByteAdr, Serialization.SerializeValue(value), cancellationToken).ConfigureAwait(false);
         }
 
@@ -544,10 +541,10 @@ namespace S7.Net
         /// <summary>
         /// Writes up to 200 bytes to the PLC. You must specify the memory area type, memory are address, byte start address and bytes count.
         /// </summary>
-        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Merker(Memory), Input, Output.</param>
+        /// <param name="dataType">Data type of the memory area, can be DB, Timer, Counter, Marker(Memory), Input, Output.</param>
         /// <param name="db">Address of the memory area (if you want to read DB1, this is set to 1). This must be set also for other memory area types: counters, timers,etc.</param>
         /// <param name="startByteAdr">Start byte address. If you want to read DB1.DBW200, this is 200.</param>
-        /// <param name="value">Bytes to write. The lenght of this parameter can't be higher than 200. If you need more, use recursion.</param>
+        /// <param name="value">Bytes to write. The length of this parameter can't be higher than 200. If you need more, use recursion.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
         /// <returns>A task that represents the asynchronous write operation.</returns>
         private async Task WriteBytesWithASingleRequestAsync(DataType dataType, int db, int startByteAdr, ReadOnlyMemory<byte> value, CancellationToken cancellationToken)
@@ -595,8 +592,7 @@ namespace S7.Net
         {
             var stream = GetStreamIfAvailable();
 
-            return queue.Enqueue(() =>
-                NoLockRequestTsduAsync(stream, requestData, offset, length, cancellationToken));
+            return queue.Enqueue(() => NoLockRequestTsduAsync(stream, requestData, offset, length, cancellationToken));
         }
 
         private async Task<COTP.TPDU> NoLockRequestTpduAsync(Stream stream, byte[] requestData, CancellationToken cancellationToken = default)
@@ -631,9 +627,7 @@ namespace S7.Net
             catch (Exception exc)
             {
                 if (exc is TPDUInvalidException || exc is TPKTInvalidException)
-                {
                     Close();
-                }
 
                 throw;
             }

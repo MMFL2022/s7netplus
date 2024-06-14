@@ -75,7 +75,8 @@ namespace S7.Net.Protocol
 
         public static void ParseResponse(byte[] message, int length, DataItem[] dataItems)
         {
-            if (length < 12) throw new Exception("Not enough data received to parse write response.");
+            if (length < 12)
+                throw new Exception("Not enough data received to parse write response.");
 
             var messageError = Serialization.GetWordAt(message, 10);
             if (messageError != 0)
@@ -96,10 +97,11 @@ namespace S7.Net.Protocol
                 }
                 catch(Exception e)
                 {
-                    if (errors == null) errors = new List<Exception>();
+                    if (errors == null)
+                        errors = new List<Exception>();
+
                     errors.Add(new Exception($"Write of dataItem {dataItems[i]} failed: {e.Message}."));
                 }
-
             }
 
             if (errors != null)

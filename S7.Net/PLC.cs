@@ -199,7 +199,7 @@ namespace S7.Net
                 tcpClient = null; // Can not reuse TcpClient once connection gets closed.
             }
 
-            //_stream = null;
+            _stream = null;
         }
 
         private void AssertPduSizeForRead(ICollection<DataItem> dataItems)
@@ -238,7 +238,8 @@ namespace S7.Net
         private int GetDataLength(IEnumerable<DataItem> dataItems)
         {
             // Odd length variables are 0-padded
-            return dataItems.Select(di => VarTypeToByteLength(di.VarType, di.Count))
+            return dataItems
+                .Select(di => VarTypeToByteLength(di.VarType, di.Count))
                 .Sum(len => (len & 1) == 1 ? len + 1 : len);
         }
 
@@ -281,7 +282,7 @@ namespace S7.Net
                 case ReadWriteErrorCode.Success:
                     break;
                 default:
-                    throw new Exception( $"Invalid response from PLC: statusCode={(byte)statusCode}.");
+                    throw new Exception($"Invalid response from PLC: statusCode={(byte)statusCode}.");
             }
         }
 

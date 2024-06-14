@@ -20,6 +20,7 @@ namespace S7.Net.Types
         {
             byte[] b = DInt.ToByteArray(value);
             float d = FromByteArray(b);
+
             return d;
         }
 
@@ -30,6 +31,7 @@ namespace S7.Net.Types
         {
             byte[] b = DWord.ToByteArray(value);
             float d = FromByteArray(b);
+
             return d;
         }
 

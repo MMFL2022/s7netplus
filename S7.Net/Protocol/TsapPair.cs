@@ -59,11 +59,17 @@ namespace S7.Net.Protocol
         /// The <paramref name="slot"/> parameter is greater than 15.</exception>
         public static TsapPair GetDefaultTsapPair(CpuType cpuType, int rack, int slot)
         {
-            if (rack < 0) throw InvalidRackOrSlot(rack, nameof(rack), "minimum", 0);
-            if (rack > 0x0F) throw InvalidRackOrSlot(rack, nameof(rack), "maximum", 0x0F);
+            if (rack < 0)
+                throw InvalidRackOrSlot(rack, nameof(rack), "minimum", 0);
 
-            if (slot < 0) throw InvalidRackOrSlot(slot, nameof(slot), "minimum", 0);
-            if (slot > 0x0F) throw InvalidRackOrSlot(slot, nameof(slot), "maximum", 0x0F);
+            if (rack > 0x0F)
+                throw InvalidRackOrSlot(rack, nameof(rack), "maximum", 0x0F);
+
+            if (slot < 0)
+                throw InvalidRackOrSlot(slot, nameof(slot), "minimum", 0);
+
+            if (slot > 0x0F)
+                throw InvalidRackOrSlot(slot, nameof(slot), "maximum", 0x0F);
 
             switch (cpuType)
             {

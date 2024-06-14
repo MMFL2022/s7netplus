@@ -14,7 +14,7 @@ namespace S7.Net.Types
 
         public byte[] Array
         {
-            get { return list.ToArray(); }
+            get => list.ToArray();
         }
 
         public int Length => list.Count;

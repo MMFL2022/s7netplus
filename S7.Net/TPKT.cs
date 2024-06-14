@@ -28,7 +28,7 @@ namespace S7.Net
         /// </summary>
         /// <param name="stream">The stream to read from</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
-        /// <returns>Task TPKT Instace</returns>
+        /// <returns>Task TPKT Instance</returns>
         public static async Task<TPKT> ReadAsync(Stream stream, CancellationToken cancellationToken)
         {
             var buf = new byte[4];

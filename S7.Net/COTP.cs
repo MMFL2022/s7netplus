@@ -71,13 +71,7 @@ namespace S7.Net
 
             public override string ToString()
             {
-                return string.Format("Length: {0} PDUType: {1} TPDUNumber: {2} Last: {3} Segment Data: {4}",
-                    HeaderLength,
-                    PDUType,
-                    TPDUNumber,
-                    LastDataUnit,
-                    BitConverter.ToString(Data)
-                    );
+                return $"Length: {HeaderLength} PDUType: {PDUType} TPDUNumber: {TPDUNumber} Last: {LastDataUnit} Segment Data: {BitConverter.ToString(Data)}";
             }
         }
 

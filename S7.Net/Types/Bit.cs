@@ -31,11 +31,13 @@ namespace S7.Net.Types
         /// <returns>A BitArray with <paramref name="length"/> bits.</returns>
         public static BitArray ToBitArray(byte[] bytes, int length)
         {
-            if (length > bytes.Length * 8) throw new ArgumentException($"Not enough data in bytes to return {length} bits.", nameof(bytes));
+            if (length > bytes.Length * 8)
+                throw new ArgumentException($"Not enough data in bytes to return {length} bits.", nameof(bytes));
 
             var bitArr = new BitArray(bytes);
             var bools = new bool[length];
-            for (var i = 0; i < length; i++) bools[i] = bitArr[i];
+            for (var i = 0; i < length; i++)
+                bools[i] = bitArr[i];
 
             return new BitArray(bools);
         }
